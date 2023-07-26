@@ -1,11 +1,32 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
+import { get } from "lodash";
+import { useState } from "react";
 
 export default function Home() {
-  async function getLatestBlock(network: string) {
-    const res = await fetch(`/numia/${network}/blocks/latest`);
+  const [state, setState] = useState<Record<string, string>>({});
+
+  async function getUrl(network: string, type: "api" | "lcd" | "rpc") {
+    const url =
+      type === "rpc"
+        ? `/numia/${network}/rpc/block`
+        : type === "lcd"
+        ? `/numia/${network}/lcd/cosmos/base/tendermint/v1beta1/blocks/latest`
+        : `/numia/${network}/height`;
+    const path = type === "rpc" ? "/blocks/latest" : type === "lcd";
+    const res = await fetch(url);
     const data = await res.json();
-    console.log(data);
+
+    const propertyPath =
+      type === "rpc"
+        ? "result.block.header.height"
+        : type === "lcd"
+        ? "block.header.height"
+        : "latestBlockHeight";
+
+    const height = get(data, propertyPath);
+    console.log(network, height);
+    setState((c) => ({ ...c, [network]: height }));
   }
   return (
     <div className={styles.container}>
@@ -25,17 +46,21 @@ export default function Home() {
 
         <div className={styles.grid}>
           <div className={styles.card}>
-            <h3>Cosmos Hub&rarr;</h3>
-            <button onClick={() => getLatestBlock("cosmos")}>Load Block</button>
-            <p>Find in-depth information about Next.js features and API.</p>
+            <h3>Cosmos Hub RPC</h3>
+            <button onClick={() => getUrl("cosmos", "rpc")}>Load Block</button>
+            {state.cosmos ? <p>Latest Block: {state.cosmos}</p> : null}
           </div>
 
           <div className={styles.card}>
-            <h3>Osmosis&rarr;</h3>
-            <button onClick={() => getLatestBlock("osmosis")}>
-              Load Block
-            </button>
-            <p>Find in-depth information about Next.js features and API.</p>
+            <h3>Osmosis LCD</h3>
+            <button onClick={() => getUrl("osmosis", "lcd")}>Load Block</button>
+            {state.osmosis ? <p>Latest Block: {state.osmosis}</p> : null}
+          </div>
+
+          <div className={styles.card}>
+            <h3>Juno API</h3>
+            <button onClick={() => getUrl("juno", "api")}>Load Block</button>
+            {state.juno ? <p>Latest Block: {state.juno}</p> : null}
           </div>
         </div>
       </main>
