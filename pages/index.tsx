@@ -3,26 +3,52 @@ import styles from "../styles/Home.module.css";
 import { get } from "lodash";
 import { useState } from "react";
 
+function getRequest(network: string, type: "api" | "lcd" | "rpc" | "rpc-post") {
+  switch (type) {
+    case "rpc":
+      return {
+        url: `/numia/${network}/rpc/block`,
+        propertyPath: "result.block.header.height",
+      };
+
+    case "rpc-post":
+      return {
+        url: `/numia/${network}/rpc`,
+        propertyPath: "result.block.header.height",
+        init: {
+          method: "POST",
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: 337952253654,
+            method: "block",
+            params: {},
+          }),
+        },
+      };
+    case "lcd":
+      return {
+        url: `/numia/${network}/lcd/cosmos/base/tendermint/v1beta1/blocks/latest`,
+        propertyPath: "block.header.height",
+      };
+    case "api":
+      return {
+        url: `/numia/${network}/height`,
+        propertyPath: "latestBlockHeight",
+      };
+  }
+}
+
 export default function Home() {
   const [state, setState] = useState<Record<string, string>>({});
 
-  async function getUrl(network: string, type: "api" | "lcd" | "rpc") {
-    const url =
-      type === "rpc"
-        ? `/numia/${network}/rpc/block`
-        : type === "lcd"
-        ? `/numia/${network}/lcd/cosmos/base/tendermint/v1beta1/blocks/latest`
-        : `/numia/${network}/height`;
+  async function getUrl(
+    network: string,
+    type: "api" | "lcd" | "rpc" | "rpc-post"
+  ) {
+    const { url, propertyPath, init } = getRequest(network, type);
     const path = type === "rpc" ? "/blocks/latest" : type === "lcd";
-    const res = await fetch(url);
+    const res = await fetch(url, init);
     const data = await res.json();
-
-    const propertyPath =
-      type === "rpc"
-        ? "result.block.header.height"
-        : type === "lcd"
-        ? "block.header.height"
-        : "latestBlockHeight";
 
     const height = get(data, propertyPath);
     console.log(network, height);
@@ -49,6 +75,14 @@ export default function Home() {
             <h3>Cosmos Hub RPC</h3>
             <button onClick={() => getUrl("cosmos", "rpc")}>Load Block</button>
             {state.cosmos ? <p>Latest Block: {state.cosmos}</p> : null}
+          </div>
+
+          <div className={styles.card}>
+            <h3>Stride RPC</h3>
+            <button onClick={() => getUrl("stride", "rpc-post")}>
+              Load Block
+            </button>
+            {state.stride ? <p>Latest Block: {state.stride}</p> : null}
           </div>
 
           <div className={styles.card}>

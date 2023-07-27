@@ -33,6 +33,8 @@ export async function middleware(request) {
     // console.log("->", nextUrl.toString());
 
     const result = await fetch(nextUrl, {
+      method: request.method,
+      body: request.body,
       headers: {
         authorization: `Bearer ${apiKey}`,
         ...request.headers,
