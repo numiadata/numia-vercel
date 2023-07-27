@@ -7,13 +7,13 @@ function getRequest(network: string, type: "api" | "lcd" | "rpc" | "rpc-post") {
   switch (type) {
     case "rpc":
       return {
-        url: `/numia/${network}/rpc/block`,
+        url: `/numia/${network}-rpc/block`,
         propertyPath: "result.block.header.height",
       };
 
     case "rpc-post":
       return {
-        url: `/numia/${network}/rpc`,
+        url: `/numia/${network}-rpc`,
         propertyPath: "result.block.header.height",
         init: {
           method: "POST",
@@ -27,7 +27,7 @@ function getRequest(network: string, type: "api" | "lcd" | "rpc" | "rpc-post") {
       };
     case "lcd":
       return {
-        url: `/numia/${network}/lcd/cosmos/base/tendermint/v1beta1/blocks/latest`,
+        url: `/numia/${network}-lcd/cosmos/base/tendermint/v1beta1/blocks/latest`,
         propertyPath: "block.header.height",
       };
     case "api":
