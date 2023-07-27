@@ -4,8 +4,8 @@ export const config = {
   matcher: "/numia/:path*",
 };
 /**
- * /numia/osmosis/rpc/block -> https://osmosis-rpc.numia.xyz/block
- * /numia/osmosis/lcd/cosmos/base/tendermint/v1beta1/blocks/10704303 -> https://osmosis-lcd.numia.xyz/cosmos/base/tendermint/v1beta1/blocks/10704303
+ * /numia/osmosis-rpc/block -> https://osmosis-rpc.numia.xyz/block
+ * /numia/osmosis-lcd/cosmos/base/tendermint/v1beta1/blocks/10704303 -> https://osmosis-lcd.numia.xyz/cosmos/base/tendermint/v1beta1/blocks/10704303
  * /numia/osmosis/height -> https://osmosis.numia.xyz/height
  */
 export async function middleware(request) {
