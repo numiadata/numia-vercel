@@ -39,7 +39,11 @@ export async function middleware(request) {
       },
     });
 
-    return new NextResponse(result.body, { headers: result.headers });
+    return new NextResponse(result.body, {
+      headers: result.headers,
+      status: result.status,
+      statusText: result.statusText,
+    });
   } catch (error) {
     return new NextResponse(
       JSON.stringify({
